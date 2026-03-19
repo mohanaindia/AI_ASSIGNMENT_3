@@ -204,29 +204,6 @@ Total Distance: 1469 km
 
 ---
 
-## Design Choices
-
-- Adjacency list used for efficiency  
-- Modular design for readability  
-- Separate files for logic and I/O  
-
----
-
-## Limitations
-
-- Uses a small subset of cities  
-- Not a full national dataset  
-
----
-
-## Future Improvements
-
-- Use real-world large datasets  
-- Add visualization  
-- Compare with A*  
-- Integrate maps  
-
----
 
 ## Conclusion
 
@@ -234,6 +211,4 @@ This project demonstrates how Dijkstra’s Algorithm can be applied to real-worl
 
 ---
 
-## Author
 
-Your Name
