@@ -1,11 +1,9 @@
 # Question 3: UGV Navigation in a Dynamic Obstacle Environment Using D* Lite
 
 ## Description
-This project simulates an Unmanned Ground Vehicle (UGV) moving through a dynamic battlefield represented as a 2D grid. The UGV starts at the top-left corner of the grid and must reach the goal at the bottom-right corner while avoiding obstacles. Unlike a static environment, this battlefield can change while the UGV is already moving, because new obstacles may appear during execution. A path that is valid at one moment may become blocked in the next, so the vehicle must be able to repair its route and continue toward the goal.
+This project simulates an Unmanned Ground Vehicle (UGV) navigating a dynamic battlefield represented as a 2D grid. The UGV starts at the top-left corner of the grid and must reach the goal at the bottom-right corner while avoiding obstacles. Unlike a static environment, this battlefield can change while the vehicle is moving, because new obstacles may appear during execution. As a result, a path that was valid earlier may suddenly become blocked. To handle this, the project uses **D* Lite**, a dynamic path-planning algorithm designed to repair paths efficiently when the map changes instead of recomputing everything from scratch.
 
-To handle this, the project uses **D* Lite**, which is a dynamic path-planning algorithm designed for environments that change over time. Instead of planning once and failing when the map changes, D* Lite updates only the affected parts of the search and repairs the path efficiently. This makes it much better suited for dynamic navigation than repeatedly running a static shortest-path algorithm from scratch.
-
-The program allows the user to enter the grid size and obstacle probabilities, generates a valid initial battlefield, computes the initial route, inserts new obstacles while the UGV is moving, repairs the path when needed, and finally prints a mission summary.
+The program first generates a valid initial environment, computes an initial path, and then simulates movement step by step. While the UGV moves, new obstacles may appear. When this happens, D* Lite updates the affected nodes, repairs the path, and allows the UGV to continue if a valid route still exists. This makes the project a practical demonstration of dynamic replanning in autonomous navigation.
 
 ## Project Structure
 ```text
@@ -19,39 +17,57 @@ q3_dynamic_ugv/
 ├── README.md
 └── requirements.txt
 ```
-##How the Algorithm Works
 
-D* Lite is an incremental heuristic search algorithm used for dynamic path planning. It is designed for situations where the environment can change after the initial path has already been planned.
+## How the Algorithm Works
+D* Lite is an incremental heuristic search algorithm used for shortest path planning in environments that may change over time. It is closely related to A*, but instead of solving the entire problem from scratch whenever the map changes, it repairs only the affected parts of the search. This makes it well suited for robotics and autonomous systems where the agent discovers new obstacles during execution.
 
 The algorithm maintains two values for each node:
+- **g(n)**: the current best-known cost from the node to the goal
+- **rhs(n)**: a one-step lookahead value used to detect whether a node is consistent
 
-g(n): the current best-known path cost from the node to the goal
+A node is:
+- **consistent** if `g(n) = rhs(n)`
+- **inconsistent** if `g(n) != rhs(n)`
 
-rhs(n): a one-step lookahead value used to detect whether the node is consistent
+The goal node is initialized with `rhs(goal) = 0`, and a priority queue is used to process nodes in order of importance. D* Lite works backward from the goal and updates path costs until the start node becomes consistent. The UGV then follows the best available path. If a new obstacle appears, only the affected cells are updated, the priority queue is adjusted, and the path is repaired from the UGV’s current position. This is why D* Lite is more efficient than repeatedly running A* from scratch in a dynamic environment.
 
-A node is considered:
+## How to Run
+Open a terminal inside the project folder and run:
 
-consistent if g(n) = rhs(n)
+```bash
+python main.py
+```
 
-inconsistent if g(n) != rhs(n)
+If your system uses Python 3 explicitly, run:
 
-The algorithm begins by setting the goal node’s rhs to 0 and inserting it into a priority queue. It then works backward through the grid, updating costs until the start node becomes locally consistent. Once this is done, the UGV can follow the best path toward the goal.
+```bash
+python3 main.py
+```
 
-When a new obstacle appears:
+On some Windows systems, you may also use:
 
-The map is updated.
+```bash
+py main.py
+```
 
-The affected cells are marked inconsistent.
+When the program starts, it will ask for:
+- number of rows
+- number of columns
+- initial obstacle probability
+- dynamic obstacle probability
 
-D* Lite updates only the necessary nodes instead of recomputing everything.
+You can enter your own values or just press **Enter** to use the defaults.
 
-The path is repaired from the UGV’s current position.
+## Output Symbols
+- `S` = Start
+- `G` = Goal
+- `U` = Current UGV position
+- `#` = Obstacle
+- `*` = Current planned path
+- `.` = Free cell
 
-This makes D* Lite much more efficient than rerunning A* or Dijkstra from scratch every time the environment changes.
-
-## HOW TO RUN 
-python main.py or python3 main.py
-
+## Sample Output
+```text
 UGV Dynamic Obstacle Navigation using D* Lite
 Press Enter to use the default value.
 
@@ -89,7 +105,7 @@ S * * * . . . . . .
 New obstacle detected at (2, 4).
 Planned route affected. Repairing path with D* Lite...
 
-Current planned path:
+Updated planned path:
 
 S . . . . . . . . .
 U * * * . . . . . .
@@ -105,9 +121,14 @@ U * * * . . . . . .
 Goal reached.
 
 Mission Summary:
-Total Steps: 18
-Total Repairs: 1
-Total Obstacle Updates: 1
-Mission Status: Success
-Total Cost: 18
-Total Nodes Processed: 74
+------------------------------
+Total Steps            : 18
+Total Repairs          : 1
+Total Obstacle Updates : 1
+Mission Status         : Success
+Total Cost             : 18
+Total Nodes Processed  : 74
+------------------------------
+```
+
+
