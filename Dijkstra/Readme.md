@@ -34,21 +34,18 @@ This project applies Dijkstra’s Algorithm to a graph representing Indian citie
 
 ## Project Structure
 
+```text
 q1_india_dijkstra/
-│
 ├── data/
 │   ├── cities.csv
 │   └── roads.csv
-│
 ├── src/
 │   ├── dijkstra.py
 │   ├── graph_loader.py
 │   └── utils.py
-│
 ├── main.py
 ├── README.md
 └── requirements.txt
-
 ---
 
 ## File Description
