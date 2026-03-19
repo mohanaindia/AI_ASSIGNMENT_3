@@ -161,10 +161,6 @@ O(V + E)
 
 ## How to Run
 
-Step 1:
-cd q1_india_dijkstra
-
-Step 2:
 python main.py
 
 OR
